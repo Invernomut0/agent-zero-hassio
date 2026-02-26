@@ -20,12 +20,14 @@ Agent Zero is an open-source AI agent framework designed as a personal, organic,
 - Recommended 4GB+ RAM for optimal performance
 - If running on low-memory systems (< 4GB total), you may need to increase swap space
 
+### Steps
+
 1. Add this repository to Home Assistant: `https://github.com/Invernomut0/agent-zero-hassio`
 2. Go to Settings > Add-ons > Add-on Store
 3. Find "Agent Zero" and click Install
-4. Configure the addon (see Configuration section)
+4. Configure the addon (see Configuration section below)
 5. Start the addon
-6. Access via the Home Assistant sidebar
+6. **Add to sidebar** (see Sidebar Integration section)
 
 **Note:** Initial startup may take 1-2 minutes as Agent Zero initializes.
 
@@ -35,20 +37,79 @@ Agent Zero is an open-source AI agent framework designed as a personal, organic,
 
 - **model_provider**: LLM provider (anthropic, openai, ollama, openrouter, aws)
 - **model_name**: Model name (e.g., claude-3-5-sonnet-20241022)
+- **api_key**: Your LLM provider API key
 - **password**: Web UI password
 
 ### Optional Options
 
-- **port**: Web UI port (default: 8080)
-- **api_port**: API port (default: 8000)
 - **context_length**: Context window size (default: 200000)
 - **username**: Web UI username (default: admin)
 - **memory_recall**: Enable memory (default: true)
 - **agent_profile**: Profile to use (default: agent0)
 
+### Example Configuration
+
+```yaml
+model_provider: anthropic
+model_name: claude-3-5-sonnet-20241022
+api_key: sk-ant-xxx...
+password: your-secure-password
+username: admin
+context_length: 200000
+memory_recall: true
+agent_profile: agent0
+```
+
+## Sidebar Integration
+
+**Important:** Due to Agent Zero's URL structure, it cannot use Home Assistant's built-in Ingress system. Instead, add it to your sidebar using `panel_iframe`.
+
+### Method 1: Via UI (Recommended)
+
+1. Go to **Settings** > **Dashboards** > **Add Dashboard**
+2. Or edit existing dashboard settings
+3. Add a new panel with:
+   - **Title:** Agent Zero
+   - **Icon:** mdi:robot
+   - **URL:** `http://YOUR_HA_IP:50001`
+
+### Method 2: Via configuration.yaml
+
+Add this to your Home Assistant `configuration.yaml`:
+
+```yaml
+panel_iframe:
+  agent_zero:
+    title: "Agent Zero"
+    icon: mdi:robot
+    url: "http://YOUR_HA_IP:50001"
+    require_admin: true
+```
+
+Replace `YOUR_HA_IP` with your Home Assistant IP address (e.g., `192.168.1.100`).
+
+Then restart Home Assistant or reload the configuration.
+
+### Accessing Agent Zero
+
+- **Via Sidebar:** Click "Agent Zero" in your Home Assistant sidebar
+- **Direct Access:** Navigate to `http://YOUR_HA_IP:50001`
+- **Port:** Default is 50001 (matches Agent Zero's default)
+
 ## Security
 
-WARNING: This addon has significant capabilities including code execution, terminal access, and file system access. Use with caution.
+**⚠️ WARNING:** This addon has significant capabilities including:
+- Code execution
+- Terminal/shell access
+- File system access
+- External API calls
+
+**Recommendations:**
+- Use strong passwords
+- Only expose to trusted networks
+- Enable `require_admin: true` in panel_iframe config
+- Keep API keys secure in addon configuration
+- Monitor addon logs regularly
 
 ## Troubleshooting
 
@@ -63,18 +124,46 @@ If you see `exit status 137` or processes being killed in logs:
    - Stopping other heavy addons temporarily
 3. **Wait for initialization:** First startup can take 2-3 minutes - be patient
 
-### Black screen when opening addon
+### "Cannot connect" or blank page
 
-1. Check addon logs for "Agent Zero is running" message
-2. Wait 2-3 minutes for full initialization
-3. Try refreshing the browser page
-4. Check browser console (F12) for errors
+1. **Check addon is running:** Go to Settings > Add-ons > Agent Zero
+2. **Verify logs:** Look for "Agent Zero is running" and "Uvicorn running on http://0.0.0.0:80"
+3. **Check URL:** Ensure you're using `http://YOUR_HA_IP:50001`
+4. **Port conflicts:** Make sure no other service is using port 50001
+5. **Browser cache:** Clear browser cache or try incognito mode
+
+### Authentication issues
+
+1. Verify username/password in addon configuration match what you're entering
+2. Check addon logs for authentication errors
+3. Try restarting the addon after changing credentials
+
+### API key errors
+
+1. Ensure your LLM provider API key is correctly set in addon configuration
+2. Verify the key has sufficient credits/permissions
+3. Check provider-specific requirements (e.g., Anthropic needs `sk-ant-` prefix)
 
 ### Other Issues
 
-- **Container won't start:** Check Docker is running and ports aren't conflicting
-- **Authentication issues:** Verify username/password in addon configuration
-- **API key errors:** Ensure your LLM provider API key is correctly set
+- **Container won't start:** Check Home Assistant system logs
+- **Black screen:** Wait 2-3 minutes for full initialization, then refresh
+- **Performance issues:** Increase context_length or switch to a lighter model
+
+## Data Persistence
+
+Agent Zero stores data in `/share/agent-zero` and `/data` directories:
+- Memory and conversation history
+- Agent profiles and configurations
+- Downloaded skills and resources
+
+This data persists across addon restarts and updates.
+
+## Support
+
+- **GitHub Issues:** https://github.com/Invernomut0/agent-zero-hassio/issues
+- **Agent Zero Documentation:** https://github.com/agent0ai/agent-zero
+- **Home Assistant Community:** https://community.home-assistant.io
 
 ## License
 

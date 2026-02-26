@@ -1,26 +1,22 @@
 name: Agent Zero
-version: "0.2.1"
+version: "1.0.0"
 slug: agent_zero
-description: AI Assistant - Autonomous agent running in Docker
+description: AI Assistant - Autonomous agent framework
 arch:
   - aarch64
   - amd64
 url: https://github.com/agent0ai/agent-zero
+image: agent0ai/agent-zero:latest
 
-# Use bridge networking with ingress
+# Network configuration
 host_network: false
-ingress: true
-ingress_entry: /
-ingress_port: 8099
-init: false
-
-# Grant Docker socket access to manage Agent Zero container
-devices:
-  - /var/run/docker.sock:/var/run/docker.sock
-
-# Port configuration
 ports:
-  8099/tcp: null
+  50001/tcp: 50001
+
+# Note: Ingress is not supported due to Agent Zero's URL structure
+# Use panel_iframe in configuration.yaml to add to sidebar
+# See DOCS.md for instructions
+ingress: false
 
 options:
   model_provider: anthropic
