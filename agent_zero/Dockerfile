@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=agent0ai/agent-zero:latest
 FROM $BUILD_FROM
 
 # Install nginx for reverse proxy with URL rewriting

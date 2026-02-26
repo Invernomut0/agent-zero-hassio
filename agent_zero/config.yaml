@@ -1,11 +1,10 @@
 name: Agent Zero
-version: "latest"
+version: "0.1.0"
 slug: agent_zero
 description: AI Assistant - Autonomous agent running in Docker
 arch:
   - aarch64
   - amd64
-image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
 
 # Use bridge networking with ingress - nginx handles the proxy
