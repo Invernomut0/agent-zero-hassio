@@ -8,6 +8,7 @@ arch:
 image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
 ingress: true
+ingress_port: 80
 ingress_entry: /
 options:
   model_provider: anthropic
