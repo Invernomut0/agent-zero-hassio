@@ -1,8 +1,9 @@
 # Addons repository
 # https://github.com/home-assistant/addons
 
-# Ignore HA config
+# Ignore HA config (except addon files)
 *.yaml
+!agent_zero/*.yaml
 !*.yaml.example
 storage/
 *.log
