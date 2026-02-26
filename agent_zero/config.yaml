@@ -9,70 +9,16 @@ url: https://github.com/agent0ai/agent-zero
 ingress: true
 ingress_entry: app
 options:
-  api_port:
-    name: API Port
-    default: 8000
-  model_provider:
-    name: LLM Provider
-    default: anthropic
-    options:
-      - a0_venice
-      - anthropic
-      - cometapi
-      - deepseek
-      - github_copilot
-      - google
-      - groq
-      - huggingface
-      - lm_studio
-      - mistral
-      - moonshot
-      - ollama
-      - openai
-      - azure
-      - bedrock
-      - openrouter
-      - sambanova
-      - venice
-      - xai
-      - zai
-      - zai_coding
-      - other
-  model_name:
-    name: Model Name
-    default: claude-3-5-sonnet-20241022
-  context_length:
-    name: Context Length (tokens)
-    default: 200000
-  username:
-    name: Web UI Username
-    default: admin
-  password:
-    name: Web UI Password
-    default: ""
-    type: password
-  root_password:
-    name: SSH Root Password
-    default: ""
-    type: password
-  memory_recall:
-    name: Enable Memory Recall
-    default: true
-    type: bool
-  agent_profile:
-    name: Agent Profile
-    default: agent0
-    options:
-      - agent0
-      - hacker
-      - researcher
-      - custom
-  api_key:
-    name: API Key
-    default: ""
-    type: password
+  model_provider: anthropic
+  model_name: claude-3-5-sonnet-20241022
+  context_length: 200000
+  username: admin
+  password: ""
+  root_password: ""
+  memory_recall: true
+  agent_profile: agent0
+  api_key: ""
 schema:
-  api_port: int
   model_provider: str
   model_name: str
   context_length: int
