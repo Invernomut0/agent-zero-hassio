@@ -1,12 +1,12 @@
 name: Agent Zero
-version: "1.0.1"
+version: "latest"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
   - aarch64
   - amd64
 url: https://github.com/agent0ai/agent-zero
-image: docker.io/agent0ai/agent-zero:latest
+image: agent0ai/agent-zero
 
 # Network configuration
 host_network: false
