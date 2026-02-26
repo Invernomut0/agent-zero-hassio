@@ -15,10 +15,10 @@ ingress_entry: /
 ingress_port: 8099
 init: false
 
-# Ports
+# Port mapping - HA Ingress expects port 8099, nginx listens on 8099
+# Agent Zero runs on internal port 50001
 ports:
-  50001/tcp: 50001
-  80/tcp: null
+  8099/tcp: null
 
 options:
   model_provider: anthropic

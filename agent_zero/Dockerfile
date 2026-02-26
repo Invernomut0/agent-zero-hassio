@@ -11,8 +11,12 @@ RUN mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
 COPY nginx.conf /etc/nginx/sites-available/agent-zero
 RUN ln -sf /etc/nginx/sites-available/agent-zero /etc/nginx/sites-enabled/
 
+# Remove default nginx site
+RUN rm -f /etc/nginx/sites-enabled/default
+
 # Copy startup script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Keep as root - Agent Zero base image expects root permissions
 CMD ["/start.sh"]
