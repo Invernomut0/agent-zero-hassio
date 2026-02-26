@@ -72,7 +72,7 @@ options:
     default: ""
     type: password
 schema:
-  api_port: port(8000,9000)
+  api_port: int
   model_provider: str
   model_name: str
   context_length: int
