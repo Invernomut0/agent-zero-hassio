@@ -8,6 +8,7 @@ arch:
 image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
 ingress: true
+ingress_port: 50001
 init: false
 options:
   model_provider: anthropic
@@ -33,7 +34,7 @@ map:
 hassio_api: true
 environment:
   WEB_UI_HOST: 0.0.0.0
-  WEB_UI_PORT: "80"
+  WEB_UI_PORT: "50001"
   # Disable heavy optional services to reduce memory usage
   A0_SET_searxng_server_enabled: "false"
   A0_SET_cloudflare_tunnel_enabled: "false"
