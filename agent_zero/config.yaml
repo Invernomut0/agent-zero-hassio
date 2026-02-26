@@ -35,6 +35,5 @@ hassio_api: true
 environment:
   WEB_UI_HOST: 0.0.0.0
   WEB_UI_PORT: "50001"
-  # Disable heavy optional services to reduce memory usage
   A0_SET_searxng_server_enabled: "false"
   A0_SET_cloudflare_tunnel_enabled: "false"
