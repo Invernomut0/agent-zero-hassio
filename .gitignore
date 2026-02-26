@@ -4,6 +4,7 @@
 # Ignore HA config (except addon files)
 *.yaml
 !agent_zero/*.yaml
+!repository.yaml
 !*.yaml.example
 storage/
 *.log

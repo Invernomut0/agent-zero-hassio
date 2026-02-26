@@ -1,0 +1,4 @@
+name: Agent Zero Addon Repository
+url: https://github.com/Invernomut0/agent-zero-hassio
+maintainer: 'Lorenzo V <invernomuto0@gmail.com>'
+description: 'Home Assistant addon for Agent Zero AI Assistant'
