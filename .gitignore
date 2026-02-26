@@ -1,0 +1,16 @@
+# Addons repository
+# https://github.com/home-assistant/addons
+
+# Ignore HA config
+*.yaml
+!*.yaml.example
+storage/
+*.log
+deps/
+__pycache__
+.pytest_cache
+.hass*/
+.mount
+network/
+backup/
+.share/
