@@ -7,9 +7,12 @@ arch:
   - amd64
 image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
-ingress: false
-ports:
-  8099/tcp: 80
+ingress: true
+ingress_port: 80
+ingress_entry: /
+init: false
+startup: application
+timeout: 60
 options:
   model_provider: anthropic
   model_name: claude-3-5-sonnet-20241022
