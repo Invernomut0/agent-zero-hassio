@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "0.2.0"
+version: "0.2.1"
 slug: agent_zero
 description: AI Assistant - Autonomous agent running in Docker
 arch:
@@ -13,6 +13,10 @@ ingress: true
 ingress_entry: /
 ingress_port: 8099
 init: false
+
+# Grant Docker socket access to manage Agent Zero container
+devices:
+  - /var/run/docker.sock:/var/run/docker.sock
 
 # Port configuration
 ports:
