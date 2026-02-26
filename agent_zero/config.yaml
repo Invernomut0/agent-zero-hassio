@@ -7,8 +7,8 @@ arch:
   - amd64
 image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
-panel: true
-ingress: false
+ingress: true
+ingress_entry: /
 options:
   model_provider: anthropic
   model_name: claude-3-5-sonnet-20241022
@@ -31,7 +31,6 @@ map:
   - share:rw
   - data:rw
 hassio_api: true
-host_network: true
 environment:
   WEB_UI_HOST: 0.0.0.0
   WEB_UI_PORT: "80"
