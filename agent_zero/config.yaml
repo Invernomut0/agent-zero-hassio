@@ -31,3 +31,6 @@ map:
   - share:rw
   - data:rw
 hassio_api: true
+environment:
+  WEB_UI_HOST: 0.0.0.0
+  WEB_UI_PORT: "80"
