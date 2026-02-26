@@ -1,5 +1,5 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-# Agent Zero base image has its own entrypoint/cmd
-# No additional setup needed
+# The base image (agent0ai/agent-zero) has everything built-in
+# We just ensure environment variables are set for HA compatibility
