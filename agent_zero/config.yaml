@@ -7,9 +7,19 @@ arch:
   - amd64
 image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
-host_network: true
-ingress: false
+
+# Use bridge networking with ingress - nginx handles the proxy
+host_network: false
+ingress: true
+ingress_entry: /
+ingress_port: 8099
 init: false
+
+# Ports
+ports:
+  50001/tcp: 50001
+  80/tcp: null
+
 options:
   model_provider: anthropic
   model_name: claude-3-5-sonnet-20241022
@@ -19,6 +29,7 @@ options:
   password: ""
   memory_recall: true
   agent_profile: agent0
+
 schema:
   model_provider: str
   model_name: str
@@ -28,12 +39,16 @@ schema:
   password: str?
   memory_recall: bool
   agent_profile: str
+
 map:
   - share:rw
   - data:rw
+
 hassio_api: true
+
+# Environment variables for Agent Zero
 environment:
-  WEB_UI_HOST: 0.0.0.0
-  WEB_UI_PORT: "80"
+  WEB_UI_HOST: 127.0.0.1
+  WEB_UI_PORT: "50001"
   A0_SET_searxng_server_enabled: "false"
   A0_SET_cloudflare_tunnel_enabled: "false"
