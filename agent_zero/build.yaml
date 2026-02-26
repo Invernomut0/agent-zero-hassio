@@ -1,5 +1,0 @@
-build_from:
-  aarch64: agent0ai/agent-zero:latest
-  amd64: agent0ai/agent-zero:latest
-
-

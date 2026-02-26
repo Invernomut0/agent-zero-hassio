@@ -5,6 +5,7 @@ description: AI Assistant - Autonomous agent running in Docker
 arch:
   - aarch64
   - amd64
+image: agent0ai/agent-zero
 url: https://github.com/agent0ai/agent-zero
 ingress: true
 ingress_port: 80
