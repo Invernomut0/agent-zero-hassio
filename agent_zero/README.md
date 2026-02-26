@@ -9,10 +9,13 @@ AI Assistant addon for Home Assistant based on Agent Zero.
 3. Install the addon from the Add-on Store
 4. Configure and start
 
-## Configuration
+## Architecture
 
-Configure the addon through the Home Assistant UI.
+This addon uses a wrapper approach:
+- No Dockerfile modifications needed
+- Uses Home Assistant's default base image
+- Pulls Agent Zero image at runtime
+- Runs nginx for URL rewriting
+- Starts Agent Zero in a separate container
 
-## Support
-
-For issues, visit: https://github.com/agent0ai/agent-zero
+This avoids the `build_from` limitation in Home Assistant addon builds.

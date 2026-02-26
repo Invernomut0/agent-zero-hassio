@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "0.1.0"
+version: "0.2.0"
 slug: agent_zero
 description: AI Assistant - Autonomous agent running in Docker
 arch:
@@ -7,20 +7,14 @@ arch:
   - amd64
 url: https://github.com/agent0ai/agent-zero
 
-# Specify Agent Zero as base image instead of HA's default
-build_from:
-  aarch64: agent0ai/agent-zero:latest
-  amd64: agent0ai/agent-zero:latest
-
-# Use bridge networking with ingress - nginx handles the proxy
+# Use bridge networking with ingress
 host_network: false
 ingress: true
 ingress_entry: /
 ingress_port: 8099
 init: false
 
-# Port mapping - HA Ingress expects port 8099, nginx listens on 8099
-# Agent Zero runs on internal port 50001
+# Port configuration
 ports:
   8099/tcp: null
 

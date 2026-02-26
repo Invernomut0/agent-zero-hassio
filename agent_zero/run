@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Agent Zero Home Assistant Addon Wrapper
+# This script handles:
+# 1. Pulling the Agent Zero image
+# 2. Starting nginx for URL rewriting
+# 3. Starting Agent Zero with proper configuration
+
+set -e
+
+# Configuration
+AGENT_ZERO_IMAGE="agent0ai/agent-zero:latest"
+NGINX_PORT="8099"
+AGENT_ZERO_PORT="50001"
+AGENT_ZERO_CONFIG_DIR="/data"
+
+# Pull the Agent Zero image
+echo "Pulling Agent Zero image: $AGENT_ZERO_IMAGE"
+docker pull $AGENT_ZERO_IMAGE
+
+# Create nginx config dynamically
+echo "Creating nginx configuration..."
+mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+
+cat > /etc/nginx/sites-available/agent-zero << EOF
+# Nginx reverse proxy for Agent Zero with URL rewriting
+server {
+    listen $NGINX_PORT;
+    server_name localhost;
+
+    location / {
+        proxy_pass http://127.0.0.1:$AGENT_ZERO_PORT;
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        proxy_buffering off;
+        proxy_request_buffering off;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    sub_filter_once off;
+    sub_filter_types text/html text/css application/javascript application/json;
+    sub_filter 'href="/' 'href="./";
+    sub_filter 'src="/' 'src="./";
+    sub_filter 'url(/' 'url(./';
+    sub_filter 'href="http:' 'href="./";
+    sub_filter 'src="http:' 'src="./";
+}
+EOF
+
+# Enable the site
+ln -sf /etc/nginx/sites-available/agent-zero /etc/nginx/sites-enabled/
+
+# Start nginx in the background
+echo "Starting nginx..."
+/usr/sbin/nginx -g "daemon off;" &
+NGINX_PID=$!
+
+# Wait a moment for nginx to start
+sleep 2
+
+# Start Agent Zero
+echo "Starting Agent Zero..."
+# Use the same entrypoint as the base image
+# Agent Zero expects to be run with its own entrypoint
+# We'll use docker run to start it with the correct configuration
+
+# Create a temporary docker command
+DOCKER_CMD="docker run -d \
+  --name agent-zero-addon \
+  -p $AGENT_ZERO_PORT:$AGENT_ZERO_PORT \
+  -v $AGENT_ZERO_CONFIG_DIR:/data \
+  -e WEB_UI_HOST=127.0.0.1 \
+  -e WEB_UI_PORT=$AGENT_ZERO_PORT \
+  -e A0_SET_searxng_server_enabled=false \
+  -e A0_SET_cloudflare_tunnel_enabled=false \
+  $AGENT_ZERO_IMAGE"
+
+# Execute the docker command
+eval $DOCKER_CMD
+AGENT_ZERO_CONTAINER_ID=$(docker ps -q --filter "name=agent-zero-addon")
+
+# Wait for Agent Zero to be ready
+echo "Waiting for Agent Zero to be ready..."
+until curl -f http://127.0.0.1:$AGENT_ZERO_PORT/api/health 2>/dev/null; do
+  echo "Waiting for Agent Zero..."
+  sleep 2
+done
+
+echo "Agent Zero is ready!"
+echo "Addon is running and accessible via Home Assistant Ingress on port $NGINX_PORT"
+
+# Keep the script running to keep the container alive
+trap "echo 'Shutting down...'; docker stop $AGENT_ZERO_CONTAINER_ID; exit 0" SIGTERM SIGINT
+
+# Wait indefinitely
+while true; do
+  sleep 10
+done
