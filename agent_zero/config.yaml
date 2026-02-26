@@ -7,6 +7,11 @@ arch:
   - amd64
 url: https://github.com/agent0ai/agent-zero
 
+# Specify Agent Zero as base image instead of HA's default
+build_from:
+  aarch64: agent0ai/agent-zero:latest
+  amd64: agent0ai/agent-zero:latest
+
 # Use bridge networking with ingress - nginx handles the proxy
 host_network: false
 ingress: true
