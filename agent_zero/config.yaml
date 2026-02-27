@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.0.3"
+version: "1.0.4"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
@@ -23,13 +23,9 @@ options: {}
 schema: {}
 
 map:
-  - data:rw
-
-# Agent Zero stores all user data in /a0/usr
-# We map HA's /data to /a0/usr for persistence
-# This includes: memory, profiles, skills, conversations, knowledge base
-volumes:
-  - /data:/a0/usr
+  - type: data
+    read_only: false
+    path: /a0/usr
 
 hassio_api: true
 
