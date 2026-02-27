@@ -1,12 +1,12 @@
 name: Agent Zero
-version: "latest"
+version: "1.0.0"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
   - aarch64
   - amd64
 url: https://github.com/agent0ai/agent-zero
-image: agent0ai/agent-zero
+build_from: Dockerfile
 
 # Network configuration - Agent Zero default port is 80
 host_network: false
@@ -48,5 +48,5 @@ hassio_api: true
 # Note: WEB_UI_HOST and WEB_UI_PORT are not set - use Agent Zero defaults
 # Agent Zero binds to 0.0.0.0:80 by default
 environment:
-  A0_SET_searxng_server_enabled: "false"
+  A0_SET_searxng_server_enabled: "true"
   A0_SET_cloudflare_tunnel_enabled: "false"

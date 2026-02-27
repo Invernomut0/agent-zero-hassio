@@ -31,6 +31,15 @@ Agent Zero is an open-source AI agent framework designed as a personal, organic,
 
 **Note:** Initial startup may take 1-2 minutes as Agent Zero initializes.
 
+## Development Tools Included
+
+This addon now includes development tools:
+- **Node.js v18** - JavaScript runtime
+- **npx** - Node package runner
+- **Bun** - JavaScript runtime and package manager
+
+These tools are available in the addon container for development and debugging purposes.
+
 ## Configuration
 
 ### Required Options
