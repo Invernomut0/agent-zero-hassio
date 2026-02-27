@@ -1,22 +1,14 @@
-FROM node:18-alpine
+# Extend official Agent Zero image (already includes Node.js and Python)
+FROM agent0ai/agent-zero:latest
 
 # Install Bun
-RUN npm install -g bun
+RUN curl -fsSL https://bun.sh/install | bash
 
-# Install Agent Zero
-RUN npm install -g @agent0ai/cli
+# Add Bun to PATH
+ENV PATH="/root/.bun/bin:${PATH}"
 
-# Create working directory
-WORKDIR /app
+# Verify installations
+RUN node --version && npm --version && bun --version
 
-# Copy existing configuration
-COPY config.yaml /app/config.yaml
-COPY DOCS.md /app/DOCS.md
-COPY README.md /app/README.md
-COPY translations/ /app/translations/
-
-# Expose port
-EXPOSE 50001
-
-# Default command
-CMD ["agent-zero", "--port", "80"]
+# Expose port (Agent Zero serves on port 80 internally)
+EXPOSE 80

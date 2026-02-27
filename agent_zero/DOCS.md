@@ -33,10 +33,10 @@ Agent Zero is an open-source AI agent framework designed as a personal, organic,
 
 ## Development Tools Included
 
-This addon now includes development tools:
-- **Node.js v18** - JavaScript runtime
-- **npx** - Node package runner
-- **Bun** - JavaScript runtime and package manager
+This addon extends the official Agent Zero image with additional development tools:
+- **Node.js** - JavaScript runtime (included in base image)
+- **npx** - Node package runner (included in base image)
+- **Bun** - Fast JavaScript runtime and package manager (added)
 
 These tools are available in the addon container for development and debugging purposes.
 
