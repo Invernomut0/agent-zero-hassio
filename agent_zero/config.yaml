@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.0.2"
+version: "1.0.3"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
@@ -18,29 +18,18 @@ ports:
 # See DOCS.md for instructions
 ingress: false
 
-options:
-  model_provider: anthropic
-  model_name: claude-3-5-sonnet-20241022
-  api_key: ""
-  context_length: 200000
-  username: admin
-  password: ""
-  memory_recall: true
-  agent_profile: agent0
+options: {}
 
-schema:
-  model_provider: str
-  model_name: str
-  api_key: str?
-  context_length: int
-  username: str
-  password: str?
-  memory_recall: bool
-  agent_profile: str
+schema: {}
 
 map:
-  - share:rw
   - data:rw
+
+# Agent Zero stores all user data in /a0/usr
+# We map HA's /data to /a0/usr for persistence
+# This includes: memory, profiles, skills, conversations, knowledge base
+volumes:
+  - /data:/a0/usr
 
 hassio_api: true
 

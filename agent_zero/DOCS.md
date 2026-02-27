@@ -42,32 +42,15 @@ These tools are available in the addon container for development and debugging p
 
 ## Configuration
 
-### Required Options
+**⚠️ IMPORTANT:** This addon has no configuration options. All settings (LLM provider, API keys, models, etc.) are configured directly in the Agent Zero web interface after starting the addon.
 
-- **model_provider**: LLM provider (anthropic, openai, ollama, openrouter, aws)
-- **model_name**: Model name (e.g., claude-3-5-sonnet-20241022)
-- **api_key**: Your LLM provider API key
-- **password**: Web UI password
+The addon will automatically persist all your data including:
+- Agent memory and conversation history
+- Custom skills and knowledge base
+- User profiles and configurations
+- API keys and LLM settings
 
-### Optional Options
-
-- **context_length**: Context window size (default: 200000)
-- **username**: Web UI username (default: admin)
-- **memory_recall**: Enable memory (default: true)
-- **agent_profile**: Profile to use (default: agent0)
-
-### Example Configuration
-
-```yaml
-model_provider: anthropic
-model_name: claude-3-5-sonnet-20241022
-api_key: sk-ant-xxx...
-password: your-secure-password
-username: admin
-context_length: 200000
-memory_recall: true
-agent_profile: agent0
-```
+All data is stored in Home Assistant's `/data` directory and mapped to Agent Zero's `/a0/usr` directory for full persistence across restarts and updates.
 
 ## Sidebar Integration
 
@@ -161,12 +144,22 @@ If you see `exit status 137` or processes being killed in logs:
 
 ## Data Persistence
 
-Agent Zero stores data in `/share/agent-zero` and `/data` directories:
-- Memory and conversation history
-- Agent profiles and configurations
-- Downloaded skills and resources
+**✅ Automatic Persistence:** All Agent Zero data is automatically persisted in Home Assistant's addon data directory.
 
-This data persists across addon restarts and updates.
+The addon maps Home Assistant's `/data` to Agent Zero's `/a0/usr` directory, which contains:
+- **Memory:** Agent memory and conversation history
+- **Skills:** Custom uploaded skills (SKILL.md modules)
+- **Knowledge:** Knowledge base documents
+- **Profiles:** Agent profiles and configurations
+- **Settings:** API keys, LLM provider settings, and preferences
+
+**This data persists across:**
+- Addon restarts
+- Addon updates
+- Home Assistant restarts
+- Container rebuilds
+
+**Note:** The first time you start the addon, you'll need to configure your LLM provider and API keys in the Agent Zero web interface. These settings will be saved and persist automatically.
 
 ## Support
 
