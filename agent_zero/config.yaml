@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.1.0"
+version: "1.1.1"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
@@ -25,7 +25,7 @@ options:
   extensions_auto_run_commands: false
 
 schema:
-  extension_repositories: [str]?
+  extension_repositories: list(str)?
   extensions_auto_install: bool
   extensions_auto_run_installers: bool
   extensions_auto_run_commands: bool
