@@ -23,4 +23,5 @@ This avoids the `build_from` limitation in Home Assistant addon builds.
 ## Notes
 
 - GitHub device authentication (used by GitHub CLI/Copilot tooling inside the addon) is persisted across restarts.
-- If you authenticated once and still get prompted again, update to addon version `1.0.6` or newer and restart the addon once.
+- User-level config/state is pinned to Home Assistant persistent `/data` (`HOME` + `XDG_*`), so settings survive addon restarts.
+- If you authenticated once and still get prompted again, update to addon version `1.0.7` or newer and restart the addon once.
