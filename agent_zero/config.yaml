@@ -28,7 +28,13 @@ map:
     path: /a0/usr
 
 hassio_api: true
+homeassistant_api: true
 
+schema: {}
+
+privileged:
+  - SYS_ADMIN
+  
 # Environment variables for Agent Zero
 # Note: WEB_UI_HOST and WEB_UI_PORT are not set - use Agent Zero defaults
 # Agent Zero binds to 0.0.0.0:80 by default
