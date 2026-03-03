@@ -1,17 +1,22 @@
-# Agent Zero - Home Assistant Addon
+# Agent Zero — Home Assistant Addon
+
+> **Version 1.3.0** | [Full Changelog](https://github.com/Invernomut0/agent-zero-hassio/blob/master/CHANGELOG.md)
 
 ## Overview
 
-Agent Zero is an open-source AI agent framework designed as a personal, organic, and dynamically growing assistant. It operates on a prompt-based architecture where the entire behavior is guided by system prompts.
+Agent Zero is an open-source AI agent framework designed as a personal, organic, and dynamically growing assistant. It operates on a prompt-based architecture where the entire behaviour is guided by system prompts.
 
 ### Key Features
 
 - Multi-agent hierarchy
-- Persistent memory
-- Full transparency and customizability
+- Persistent memory and conversation history
+- Full transparency and customisability
 - Skills system (SKILL.md standard)
-- MCP Support
-- A2A Protocol
+- MCP (Model Context Protocol) support
+- A2A (Agent-to-Agent) Protocol
+- **SearXNG web search** enabled by default
+- **Extension repository management** — install community extensions at startup
+- Bun runtime included alongside Node.js and npm
 
 ## Installation
 
@@ -66,12 +71,14 @@ extensions_auto_run_commands: false
 extensions_debug: true
 ```
 
-During Agent Zero `agent_init`, a built-in bootstrap extension does:
+During Agent Zero `agent_init`, the built-in bootstrap extension (`_05_extension_repo_bootstrap.py`) does:
 
-1. clone/pull of each configured repository into `/a0/usr/extensions/repos/`
-2. installer execution when present (idempotent scripts recommended)
-3. fallback copy of `python/extensions/**` into `/a0/python/extensions/**`
-4. optional execution of `auto_run` commands declared in `agent0-extension.json`
+1. Clone (first run) or pull (subsequent runs) each configured repository into `/a0/usr/extensions/repos/<slug>`
+2. Execute the installer script if found and installer auto-run is enabled (idempotent)
+3. Fallback copy of `python/extensions/**` into `/a0/python/extensions/**` when no installer is present
+4. Optionally execute `auto_run` commands declared in `agent0-extension.json`
+
+> **v1.3.0 change:** Bootstrap is invoked **exclusively** via the `agent_init` hook. Any previous custom invocation mechanism must be removed.
 
 When `extensions_debug=true`, addon logs include:
 
@@ -221,6 +228,33 @@ This ensures device logins and user settings do not need to be repeated after ad
 - Container rebuilds
 
 **Note:** The first time you start the addon, you'll need to configure your LLM provider and API keys in the Agent Zero web interface. These settings will be saved and persist automatically.
+
+## Changelog
+
+### v1.3.0 — 2026-03-03
+
+**Breaking:** Extension bootstrap is now invoked **exclusively** via the `agent_init` hook. Remove any custom invocation mechanisms from previous versions.
+
+### v1.2.0 — 2026-03-03
+
+- Extension repository management system (`extension_repositories`, `extensions_auto_install`, `extensions_auto_run_installers`, `extensions_auto_run_commands`, `extensions_debug`)
+- `agent0-extension.json` manifest format support
+- Repositories persisted at `/a0/usr/extensions/repos/`
+
+### v1.0.7 — 2026-03-02
+
+- GitHub CLI authentication persisted across restarts via `GH_CONFIG_DIR`
+- Full XDG path pinning to `/a0/usr`
+- Switched to `addon_config` map type for correct persistence
+
+### v1.0.0 — v1.0.1 — 2026-02-27
+
+- Initial release: custom Dockerfile extending `agent0ai/agent-zero:latest`
+- Bun runtime installed alongside Node.js + npm
+- Port 80 → 50001, SearXNG enabled by default
+- `addon_config` persistence for `/a0/usr`
+
+---
 
 ## Support
 

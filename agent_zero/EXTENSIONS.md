@@ -2,6 +2,10 @@
 
 This document defines how to build a repository that can be automatically managed by the Home Assistant Agent Zero addon.
 
+> **Applies to addon v1.2.0+**  
+> v1.3.0 breaking change: extension bootstrap is invoked **exclusively** via the `agent_init` hook.  
+> See the [Changelog](../CHANGELOG.md) for full version history.
+
 ## Goals
 
 A managed extension repository should be:
@@ -44,7 +48,7 @@ Example:
 
 ## Automatic management rule
 
-During Agent Zero `agent_init`, the addon bootstrapper:
+During Agent Zero `agent_init` (and **only** `agent_init` from v1.3.0 onwards), the addon bootstrapper:
 
 1. reads Home Assistant addon options from `/data/options.json`
 2. for each URL in `extension_repositories`, clone/pull repository in `/a0/usr/extensions/repos/<repo-name>`
@@ -140,6 +144,13 @@ The repository `https://github.com/Invernomut0/telegram_a0` follows this model w
 - extension files under `python/extensions/...`
 - idempotent installer script `install_agent0_telegram_ext.sh`
 - startup-safe strategy for environments that persist only `/a0/usr`
+
+## Version compatibility
+
+| Addon version | Bootstrap invocation |
+|---|---|
+| v1.2.x | `agent_init` hook (primary) |
+| **v1.3.0+** | `agent_init` hook **only** (breaking change) |
 
 ## Validation checklist
 
