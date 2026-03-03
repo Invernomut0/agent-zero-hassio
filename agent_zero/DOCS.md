@@ -48,19 +48,22 @@ LLM provider settings, API keys and model choices are still configured in the Ag
 
 Available addon options:
 
-- `extension_repositories` (list of git URLs)
+- `extension_repositories` (array of git URLs)
 - `extensions_auto_install` (`true/false`)
 - `extensions_auto_run_installers` (`true/false`)
 - `extensions_auto_run_commands` (`true/false`, advanced)
+- `extensions_debug` (`true/false`, verbose extension bootstrap logs)
 
 Example:
 
 ```yaml
 extension_repositories:
    - https://github.com/Invernomut0/telegram_a0
+   - https://github.com/example/another_agent0_extension
 extensions_auto_install: true
 extensions_auto_run_installers: true
 extensions_auto_run_commands: false
+extensions_debug: true
 ```
 
 At addon startup, a built-in bootstrap extension does:
@@ -69,6 +72,14 @@ At addon startup, a built-in bootstrap extension does:
 2. installer execution when present (idempotent scripts recommended)
 3. fallback copy of `python/extensions/**` into `/a0/python/extensions/**`
 4. optional execution of `auto_run` commands declared in `agent0-extension.json`
+
+When `extensions_debug=true`, addon logs include:
+
+- raw options loading summary
+- parsed repository list and count
+- per-repository processing details
+- installer selection and execution arguments
+- each `auto_run` command before execution and its outcome
 
 > [!WARNING]
 > `extensions_auto_run_commands` executes shell commands from repository manifests.
@@ -80,7 +91,7 @@ The addon will automatically persist all your data including:
 - User profiles and configurations
 - API keys and LLM settings
 
-All data is stored in Home Assistant's add-on data volume and mapped to Agent Zero's `/a0/usr` directory for full persistence across restarts and updates.
+All data is stored in Home Assistant's `addon_config` storage and mounted to Agent Zero's `/a0/usr` directory for full persistence across restarts and updates.
 
 > [!IMPORTANT]
 > Following the official Agent Zero documentation, the addon maps **only** `/a0/usr` for persistence.
@@ -178,9 +189,9 @@ If you see `exit status 137` or processes being killed in logs:
 
 ## Data Persistence
 
-**✅ Automatic Persistence:** All Agent Zero data is automatically persisted in Home Assistant's add-on data volume.
+**✅ Automatic Persistence:** All Agent Zero data is automatically persisted in Home Assistant `addon_config` storage.
 
-The addon maps Home Assistant's persistent data volume to Agent Zero's `/a0/usr` directory, which contains:
+The addon maps Home Assistant `addon_config` storage to Agent Zero's `/a0/usr` directory, which contains:
 - **Memory:** Agent memory and conversation history
 - **Skills:** Custom uploaded skills (SKILL.md modules)
 - **Knowledge:** Knowledge base documents
@@ -188,12 +199,12 @@ The addon maps Home Assistant's persistent data volume to Agent Zero's `/a0/usr`
 - **Settings:** API keys, LLM provider settings, and preferences
 - **GitHub auth:** GitHub CLI/Copilot device auth session files
 
-Additionally, user-level configuration/state is forced to Home Assistant persistent storage (`/data`):
-- `HOME=/data`
-- `XDG_CONFIG_HOME=/data/.config`
-- `XDG_DATA_HOME=/data/.local/share`
-- `XDG_STATE_HOME=/data/.local/state`
-- `GH_CONFIG_DIR=/data/.config/gh`
+Additionally, user-level configuration/state is forced under `/a0/usr`:
+- `HOME=/a0/usr`
+- `XDG_CONFIG_HOME=/a0/usr/.config`
+- `XDG_DATA_HOME=/a0/usr/.local/share`
+- `XDG_STATE_HOME=/a0/usr/.local/state`
+- `GH_CONFIG_DIR=/a0/usr/.config/gh`
 
 This ensures device logins and user settings do not need to be repeated after addon restarts.
 

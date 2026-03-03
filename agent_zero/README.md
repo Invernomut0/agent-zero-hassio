@@ -28,20 +28,22 @@ This addon now supports one or more **extension repositories** that are fetched 
 
 In the Home Assistant addon configuration, use:
 
-- `extension_repositories`: Git URL(s) as text (separate multiple entries with comma or newline)
+- `extension_repositories`: array of Git URLs
 - `extensions_auto_install`: copy extension files automatically (`true` by default)
 - `extensions_auto_run_installers`: execute repo installer script if present (`true` by default)
 - `extensions_auto_run_commands`: execute manifest startup commands (`false` by default, advanced)
+- `extensions_debug`: verbose bootstrap logs (`false` by default)
 
 Example configuration:
 
 ```yaml
-extension_repositories: |
-	https://github.com/Invernomut0/telegram_a0
-	https://github.com/example/another_agent0_extension
+extension_repositories:
+	- https://github.com/Invernomut0/telegram_a0
+	- https://github.com/example/another_agent0_extension
 extensions_auto_install: true
 extensions_auto_run_installers: true
 extensions_auto_run_commands: false
+extensions_debug: true
 ```
 
 At startup, the addon bootstrapper will:
@@ -55,8 +57,28 @@ At startup, the addon bootstrapper will:
 
 For extension repo authoring rules, see `EXTENSIONS.md`.
 
+### Required extension repository structure
+
+Recommended tree:
+
+- `python/extensions/agent_init/*.py` → startup hooks
+- `python/extensions/response_stream/*.py` → response parsing hooks
+- `python/extensions/message_loop_end/*.py` → end-of-loop notification hooks
+- `agent0-extension.json` (optional manifest)
+- `install_agent0_extension.sh` (optional installer, idempotent)
+
+If `install_agent0_extension.sh` is present (or another known installer), it will be executed when installer auto-run is enabled.
+If no installer is found, files under `python/extensions/**` are copied automatically.
+
+`agent0-extension.json` may define:
+
+- `install_script`
+- `install_args`
+- `extension_paths`
+- `auto_run` (startup commands, executed only when `extensions_auto_run_commands=true`)
+
 ## Notes
 
 - GitHub device authentication (used by GitHub CLI/Copilot tooling inside the addon) is persisted across restarts.
-- User-level config/state is pinned to Home Assistant persistent `/data` (`HOME` + `XDG_*`), so settings survive addon restarts.
+- User-level config/state is pinned to `/a0/usr` (mounted from Home Assistant `addon_config`), so settings survive addon restarts.
 - If you authenticated once and still get prompted again, update to addon version `1.0.7` or newer and restart the addon once.

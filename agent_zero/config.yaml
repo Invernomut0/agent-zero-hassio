@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.1.2"
+version: "1.2.1"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
@@ -19,19 +19,21 @@ ports:
 ingress: false
 
 options:
-  extension_repositories: ""
+  extension_repositories: []
   extensions_auto_install: true
   extensions_auto_run_installers: true
   extensions_auto_run_commands: false
+  extensions_debug: false
 
 schema:
-  extension_repositories: str?
+  extension_repositories: list(str)
   extensions_auto_install: bool
   extensions_auto_run_installers: bool
   extensions_auto_run_commands: bool
+  extensions_debug: bool
 
 map:
-  - type: data
+  - type: addon_config
     read_only: false
     path: /a0/usr
 
@@ -47,8 +49,8 @@ privileged:
 environment:
   A0_SET_searxng_server_enabled: "true"
   A0_SET_cloudflare_tunnel_enabled: "false"
-  HOME: "/data"
-  XDG_CONFIG_HOME: "/data/.config"
-  XDG_DATA_HOME: "/data/.local/share"
-  XDG_STATE_HOME: "/data/.local/state"
-  GH_CONFIG_DIR: "/data/.config/gh"
+  HOME: "/a0/usr"
+  XDG_CONFIG_HOME: "/a0/usr/.config"
+  XDG_DATA_HOME: "/a0/usr/.local/share"
+  XDG_STATE_HOME: "/a0/usr/.local/state"
+  GH_CONFIG_DIR: "/a0/usr/.config/gh"

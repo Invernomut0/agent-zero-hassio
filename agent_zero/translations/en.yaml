@@ -5,7 +5,7 @@ app:
 configuration:
   extension_repositories:
     name: Extension repositories
-    description: Git repository URLs containing Agent Zero extensions (separate multiple URLs with comma or new line).
+    description: Array of Git repository URLs containing Agent Zero extensions.
   extensions_auto_install:
     name: Auto-install extension files
     description: Automatically copy extension files from configured repositories at startup.
@@ -15,3 +15,6 @@ configuration:
   extensions_auto_run_commands:
     name: Auto-run manifest commands
     description: Execute startup commands declared by extension manifests (advanced, use only with trusted repositories).
+  extensions_debug:
+    name: Extensions debug logs
+    description: Enable verbose logs for extension repository loading and auto-run command execution.

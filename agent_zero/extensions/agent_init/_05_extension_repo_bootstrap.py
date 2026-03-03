@@ -11,6 +11,7 @@ Configuration keys (addon options):
 - extensions_auto_install: bool
 - extensions_auto_run_installers: bool
 - extensions_auto_run_commands: bool
+- extensions_debug: bool
 
 Repository conventions:
 - Optional manifest file: ``agent0-extension.json``
@@ -55,6 +56,11 @@ def _log(message: str) -> None:
 	print(f"[ext-repo-bootstrap] {message}")
 
 
+def _debug(enabled: bool, message: str) -> None:
+	if enabled:
+		_log(f"[debug] {message}")
+
+
 def _read_options() -> dict[str, Any]:
 	if not OPTIONS_FILE.exists():
 		return {}
@@ -79,15 +85,21 @@ def _to_bool(value: Any, default: bool) -> bool:
 	return default
 
 
-def _parse_repositories(value: Any) -> list[str]:
+def _parse_repositories(value: Any, debug_enabled: bool = False) -> list[str]:
 	if isinstance(value, list):
 		repos = [str(x).strip() for x in value if str(x).strip()]
-		return list(dict.fromkeys(repos))
+		unique = list(dict.fromkeys(repos))
+		_debug(debug_enabled, f"extension_repositories parsed: input={len(value)} unique={len(unique)}")
+		for idx, repo in enumerate(unique, start=1):
+			_debug(debug_enabled, f"repo[{idx}]={repo}")
+		return unique
 
-	if isinstance(value, str):
-		normalized = value.replace("\n", ",").replace(";", ",")
-		parts = [x.strip() for x in normalized.split(",") if x.strip()]
-		return list(dict.fromkeys(parts))
+	if value is not None:
+		_log(
+			"Invalid type for extension_repositories: expected array/list of URLs. "
+			f"Received {type(value).__name__}."
+		)
+		_debug(debug_enabled, f"raw extension_repositories value={value!r}")
 
 	return []
 
@@ -177,7 +189,12 @@ def _copy_extensions_tree(repo_path: Path, relative_paths: list[str]) -> int:
 	return copied
 
 
-def _maybe_run_install_script(repo_path: Path, manifest: dict[str, Any], auto_run_installers: bool) -> bool:
+def _maybe_run_install_script(
+	repo_path: Path,
+	manifest: dict[str, Any],
+	auto_run_installers: bool,
+	debug_enabled: bool,
+) -> bool:
 	if not auto_run_installers:
 		_log(f"Installer auto-run disabled for {repo_path.name}")
 		return False
@@ -193,6 +210,7 @@ def _maybe_run_install_script(repo_path: Path, manifest: dict[str, Any], auto_ru
 				break
 
 	if not script_name:
+		_debug(debug_enabled, f"No installer script found for {repo_path.name}")
 		return False
 
 	script_path = repo_path / script_name
@@ -206,6 +224,7 @@ def _maybe_run_install_script(repo_path: Path, manifest: dict[str, Any], auto_ru
 	manifest_args = manifest.get("install_args")
 	if isinstance(manifest_args, list) and manifest_args:
 		args = [str(x) for x in manifest_args]
+	_debug(debug_enabled, f"Running installer for {repo_path.name}: script={script_name} args={args}")
 
 	code, out = _run([str(script_path), *args], cwd=repo_path)
 	if code != 0:
@@ -218,18 +237,29 @@ def _maybe_run_install_script(repo_path: Path, manifest: dict[str, Any], auto_ru
 	return True
 
 
-def _maybe_run_auto_commands(repo_path: Path, manifest: dict[str, Any], auto_run_commands: bool) -> None:
+def _maybe_run_auto_commands(
+	repo_path: Path,
+	manifest: dict[str, Any],
+	auto_run_commands: bool,
+	debug_enabled: bool,
+) -> None:
 	if not auto_run_commands:
+		_debug(debug_enabled, f"auto_run disabled for {repo_path.name}")
 		return
 
 	commands = manifest.get("auto_run")
 	if not isinstance(commands, list):
+		_debug(debug_enabled, f"No auto_run commands declared for {repo_path.name}")
 		return
+
+	_debug(debug_enabled, f"Found {len(commands)} auto_run command(s) for {repo_path.name}")
 
 	for idx, raw_cmd in enumerate(commands, start=1):
 		if not isinstance(raw_cmd, str) or not raw_cmd.strip():
+			_debug(debug_enabled, f"Skipping empty/invalid auto_run command #{idx} for {repo_path.name}")
 			continue
 		cmd = raw_cmd.strip()
+		_debug(debug_enabled, f"Executing auto_run command #{idx} for {repo_path.name}: {cmd}")
 		code, out = _run([cmd], cwd=repo_path, shell=True)
 		if code != 0:
 			_log(f"auto_run command #{idx} failed for {repo_path.name}: {cmd} -> {out}")
@@ -239,9 +269,16 @@ def _maybe_run_auto_commands(repo_path: Path, manifest: dict[str, Any], auto_run
 				_log(out)
 
 
-def _process_repository(repo_url: str, auto_install: bool, auto_run_installers: bool, auto_run_commands: bool) -> None:
+def _process_repository(
+	repo_url: str,
+	auto_install: bool,
+	auto_run_installers: bool,
+	auto_run_commands: bool,
+	debug_enabled: bool,
+) -> None:
 	repo_name = _slug_from_url(repo_url)
 	repo_path = REPOS_ROOT / repo_name
+	_debug(debug_enabled, f"Processing repository url={repo_url} slug={repo_name} path={repo_path}")
 
 	if not _clone_or_update_repo(repo_url, repo_path):
 		return
@@ -252,6 +289,7 @@ def _process_repository(repo_url: str, auto_install: bool, auto_run_installers: 
 		repo_path=repo_path,
 		manifest=manifest,
 		auto_run_installers=auto_run_installers,
+		debug_enabled=debug_enabled,
 	)
 
 	if auto_install and not installer_executed:
@@ -260,6 +298,7 @@ def _process_repository(repo_url: str, auto_install: bool, auto_run_installers: 
 			rel_paths = [str(x).strip() for x in extension_paths if str(x).strip()]
 		else:
 			rel_paths = DEFAULT_EXTENSION_PATHS
+		_debug(debug_enabled, f"Fallback copy paths for {repo_name}: {rel_paths}")
 
 		copied = _copy_extensions_tree(repo_path=repo_path, relative_paths=rel_paths)
 		if copied > 0:
@@ -271,6 +310,7 @@ def _process_repository(repo_url: str, auto_install: bool, auto_run_installers: 
 		repo_path=repo_path,
 		manifest=manifest,
 		auto_run_commands=auto_run_commands,
+		debug_enabled=debug_enabled,
 	)
 
 
@@ -288,10 +328,13 @@ class ExtensionRepositoryBootstrapExtension(Extension):
 			ExtensionRepositoryBootstrapExtension._started = True
 
 		options = _read_options()
-		repositories = _parse_repositories(options.get("extension_repositories"))
+		debug_enabled = _to_bool(options.get("extensions_debug"), False)
+		_debug(debug_enabled, f"Loaded options keys: {sorted(list(options.keys()))}")
+		repositories = _parse_repositories(options.get("extension_repositories"), debug_enabled=debug_enabled)
 		auto_install = _to_bool(options.get("extensions_auto_install"), True)
 		auto_run_installers = _to_bool(options.get("extensions_auto_run_installers"), True)
 		auto_run_commands = _to_bool(options.get("extensions_auto_run_commands"), False)
+		_debug(debug_enabled, f"auto flags -> install={auto_install} installers={auto_run_installers} run_commands={auto_run_commands}")
 
 		if not repositories:
 			_log("No extension repositories configured")
@@ -301,7 +344,8 @@ class ExtensionRepositoryBootstrapExtension(Extension):
 			f"Starting extension bootstrap: repos={len(repositories)} "
 			f"auto_install={auto_install} "
 			f"auto_run_installers={auto_run_installers} "
-			f"auto_run_commands={auto_run_commands}"
+			f"auto_run_commands={auto_run_commands} "
+			f"debug={debug_enabled}"
 		)
 
 		for repo_url in repositories:
@@ -316,6 +360,7 @@ class ExtensionRepositoryBootstrapExtension(Extension):
 				auto_install=auto_install,
 				auto_run_installers=auto_run_installers,
 				auto_run_commands=auto_run_commands,
+				debug_enabled=debug_enabled,
 			)
 
 		_log("Extension bootstrap completed")
