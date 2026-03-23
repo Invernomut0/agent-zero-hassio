@@ -45,6 +45,12 @@ if [ "$A0_BRANCH" = "development" ]; then
             --exclude='usr' \
             "$A0_SRC/" /a0/
         echo "[branch-selector] Development branch active."
+
+        # Install any new Python dependencies introduced by the development branch
+        if [ -f "/a0/requirements.txt" ]; then
+            echo "[branch-selector] Installing development requirements..."
+            pip install --quiet -r /a0/requirements.txt 2>&1 | tail -5 || true
+        fi
     fi
 else
     echo "[branch-selector] Branch: main (latest image — no sync needed)."
