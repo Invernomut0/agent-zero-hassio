@@ -4,10 +4,6 @@ FROM agent0ai/agent-zero:latest
 # Install dependencies for Bun and branch-selector (rsync used to overlay /a0)
 RUN apt-get update && apt-get install -y unzip git ca-certificates rsync && rm -rf /var/lib/apt/lists/*
 
-# Pre-install Python packages required by the development branch of agent-zero
-# (e.g. giturlparse used by helpers/git.py – missing from the base image)
-RUN python3 -m pip install --no-cache-dir giturlparse
-
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash
 

@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.3] - 2026-03-23
+
+### Fixed
+
+- **Docker build failure: `No module named pip`** when installing `giturlparse`.
+  - **Root cause**: `agent0ai/agent-zero:latest` uses a Python virtualenv activated at runtime via `setup_venv.sh`. At Docker build time neither `pip` nor `python3 -m pip` are available.
+  - **Fix**: removed the `RUN pip install` from the `Dockerfile`; instead `giturlparse` is now installed via `pip install --quiet giturlparse` in `run_A0.sh` immediately after the venv is activated, where `pip` is always available.
+
+---
+
 ## [1.4.2] - 2026-03-23
 
 ### Fixed

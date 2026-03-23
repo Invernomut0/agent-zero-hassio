@@ -3,6 +3,9 @@
 . "/ins/setup_venv.sh" "$@"
 . "/ins/copy_A0.sh" "$@"
 
+# Ensure packages needed by both branches are present in the venv
+pip install --quiet giturlparse 2>/dev/null || true
+
 # ---------------------------------------------------------------------------
 # Agent Zero branch selector
 # Reads option 'agent_zero_branch' from /data/options.json.
