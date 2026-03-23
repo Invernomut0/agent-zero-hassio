@@ -3,7 +3,11 @@
 . "/ins/setup_venv.sh" "$@"
 . "/ins/copy_A0.sh" "$@"
 
-# Ensure packages needed by both branches are present in the venv
+# Stop run_tunnel_api while we sync and install dependencies to avoid race
+# conditions where it starts with an incomplete environment.
+supervisorctl stop run_tunnel_api 2>/dev/null || true
+
+# Ensure giturlparse is available (known new dep)
 pip install --quiet giturlparse 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
@@ -142,6 +146,9 @@ else:
     print('[cors-patch] Pattern not found – no changes')
 CORS_PATCH
 # ---------------------------------------------------------------------------
+
+# Environment is ready: restart run_tunnel_api now that deps are installed
+supervisorctl start run_tunnel_api 2>/dev/null || true
 
 python /a0/prepare.py --dockerized=true
 # python /a0/preload.py --dockerized=true # no need to run preload if it's done during container build

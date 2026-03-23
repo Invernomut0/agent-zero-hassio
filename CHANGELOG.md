@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.7] - 2026-03-23
+
+### Fixed
+
+- **Race condition: `No module named 'watchdog'`** on `run_tunnel_api` second restart.
+  - **Root cause**: `run_tunnel_api` is started by supervisord in parallel with `run_ui` (which runs `run_A0.sh`). The pip install loop runs inside `run_ui`'s startup script. When `run_tunnel_api` crashes and supervisord auto-restarts it, the install loop is still in progress → second startup attempt also fails with the missing module.
+  - **Fix**: `supervisorctl stop run_tunnel_api` is called at the **very beginning** of `run_A0.sh` (after venv activation), before any git sync or pip install. After all setup is complete (sync + pycache clear + pip install + cors patch), `supervisorctl start run_tunnel_api` restarts it with a fully-ready environment.
+
+---
+
 ## [1.4.6] - 2026-03-23
 
 ### Fixed
