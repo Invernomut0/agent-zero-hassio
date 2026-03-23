@@ -49,13 +49,18 @@ if [ "$A0_BRANCH" = "development" ]; then
         echo "[branch-selector] Applying development files to /a0 ..."
         rsync -a --delete \
             --exclude='.git' \
-            --exclude='memory/' \
-            --exclude='work_dir/' \
-            --exclude='data/' \
-            --exclude='logs/' \
-            --exclude='.env' \
-            --exclude='tmp/' \
+            --exclude='usr' \
             "$A0_SRC/" /a0/
+
+        # Sync application-owned subdirs of usr/ (e.g. plugins) without touching
+        # user-generated data. --exclude='usr' above protects user settings, but
+        # the development branch keeps app code in usr/plugins/ which must exist.
+        for app_dir in plugins; do
+            if [ -d "$A0_SRC/usr/$app_dir" ]; then
+                mkdir -p "/a0/usr/$app_dir"
+                rsync -a --delete "$A0_SRC/usr/$app_dir/" "/a0/usr/$app_dir/"
+            fi
+        done
 
         # Clear stale bytecode so Python picks up new source files
         find /a0 -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true

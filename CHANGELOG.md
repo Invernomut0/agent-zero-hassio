@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.10] - 2026-03-23
+
+### Fixed
+
+- **User configurations lost on restart** (regression introduced in v1.4.8).
+  - **Root cause**: v1.4.8 removed `--exclude='usr'` from rsync to fix `FileNotFoundError: '/a0/usr/plugins'`. But `/a0/usr/` is also where agent-zero stores user settings, so removing the exclude caused every rsync to wipe user data. The per-file excludes added in v1.4.9 didn't help because user data lives inside `usr/`.
+  - **Fix**: restored `--exclude='usr'` to protect all user data inside `/a0/usr/`. Application-owned subdirectories within `usr/` (currently just `plugins/`) are then explicitly synced in a second targeted `rsync` step. This preserves user settings while keeping application code up to date.
+
+---
+
 ## [1.4.9] - 2026-03-23
 
 ### Fixed
