@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.4] - 2026-03-23
+
+### Fixed
+
+- **`ImportError: cannot import name 'whisper' from 'python.helpers' (unknown location)`** when using the `development` branch.
+  - **Root cause**: `pip install -r /a0/requirements.txt` (added in v1.4.3) was upgrading/installing packages from the development branch's `requirements.txt`, which caused Python to resolve the `helpers` package from an installed location instead of the filesystem, breaking module resolution. The `(unknown location)` in the traceback was the tell-tale sign.
+  - **Fix**: removed the `requirements.txt` install step entirely. The specific missing package (`giturlparse`) is already installed at startup before any service runs. Additionally, `__pycache__` directories are now purged after each rsync to prevent stale bytecode from shadowing new source files.
+
+---
+
 ## [1.4.3] - 2026-03-23
 
 ### Fixed

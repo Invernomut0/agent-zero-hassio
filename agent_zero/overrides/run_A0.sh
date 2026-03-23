@@ -47,13 +47,11 @@ if [ "$A0_BRANCH" = "development" ]; then
             --exclude='.git' \
             --exclude='usr' \
             "$A0_SRC/" /a0/
-        echo "[branch-selector] Development branch active."
 
-        # Install any new Python dependencies introduced by the development branch
-        if [ -f "/a0/requirements.txt" ]; then
-            echo "[branch-selector] Installing development requirements..."
-            python3 -m pip install --quiet -r /a0/requirements.txt 2>&1 | tail -5 || true
-        fi
+        # Clear stale bytecode so Python picks up new source files
+        find /a0 -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+
+        echo "[branch-selector] Development branch active."
     fi
 else
     echo "[branch-selector] Branch: main (latest image — no sync needed)."
