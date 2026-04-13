@@ -57,3 +57,4 @@ environment:
   XDG_DATA_HOME: "/a0/usr/.local/share"
   XDG_STATE_HOME: "/a0/usr/.local/state"
   GH_CONFIG_DIR: "/a0/usr/.config/gh"
+  PIP_CACHE_DIR: "/a0/usr/.pip-cache"
