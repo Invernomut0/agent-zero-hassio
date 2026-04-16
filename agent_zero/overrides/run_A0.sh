@@ -157,6 +157,45 @@ else:
 CORS_PATCH
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Persist /a0/tmp across container restarts
+# HA Supervisor recreates the container on every addon restart, wiping
+# ephemeral paths. In standard Docker, tmp/ survives between restarts.
+# Symlink to persistent storage to match that behaviour.
+# ---------------------------------------------------------------------------
+if [ ! -L "/a0/tmp" ]; then
+    mkdir -p /a0/usr/tmp
+    rm -rf /a0/tmp
+    ln -sf /a0/usr/tmp /a0/tmp
+    echo "[persist] Symlinked /a0/tmp -> /a0/usr/tmp"
+fi
+
+# ---------------------------------------------------------------------------
+# Plugin pip dependency restoration
+# User-installed plugins may declare pip dependencies in requirements.txt.
+# Since the venv is ephemeral, restore them on every startup.
+# PIP_CACHE_DIR under /a0/usr makes subsequent installs near-instant.
+# ---------------------------------------------------------------------------
+export PIP_CACHE_DIR="/a0/usr/.pip-cache"
+mkdir -p "$PIP_CACHE_DIR"
+
+if [ -d "/a0/usr/plugins" ]; then
+    PLUGIN_RESTORE_COUNT=0
+    for plugin_dir in /a0/usr/plugins/*/; do
+        [ -d "$plugin_dir" ] || continue
+        plugin_name=$(basename "$plugin_dir")
+        if [ -f "$plugin_dir/requirements.txt" ]; then
+            echo "[plugin-deps] Restoring pip dependencies for $plugin_name..."
+            pip install --quiet -r "$plugin_dir/requirements.txt" 2>&1 || \
+                echo "[plugin-deps] WARNING: Failed to restore deps for $plugin_name"
+            PLUGIN_RESTORE_COUNT=$((PLUGIN_RESTORE_COUNT + 1))
+        fi
+    done
+    if [ "$PLUGIN_RESTORE_COUNT" -gt 0 ]; then
+        echo "[plugin-deps] Restored dependencies for $PLUGIN_RESTORE_COUNT plugin(s)"
+    fi
+fi
+
 # Environment is ready: restart run_tunnel_api now that deps are installed
 supervisorctl start run_tunnel_api 2>/dev/null || true
 
