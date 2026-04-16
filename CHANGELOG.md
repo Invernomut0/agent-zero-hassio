@@ -7,6 +7,20 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.12] - 2026-04-13
+
+### Fixed
+
+- **WhatsApp session lost on every addon restart** — users had to re-scan the QR code after each restart.
+  - **Root cause**: HA Supervisor recreates the container on every addon restart (unlike regular Docker which preserves the container filesystem). Agent Zero stores the Baileys auth session in `tmp/whatsapp/session/` which is outside the persistent `/a0/usr/` volume.
+  - **Fix**: symlink `/a0/tmp` → `/a0/usr/tmp` at startup so the entire `tmp/` directory persists across container restarts, matching standard Docker behaviour. Also fixes `tmp/settings.json` persistence (ref: agent0ai/agent-zero#952).
+
+- **Plugin pip dependencies lost on every addon restart** — user-installed plugins with pip dependencies were broken after each restart.
+  - **Root cause**: plugins install pip packages into the Python venv (`/opt/venv-a0/`) via `hooks.install()`, but this path is ephemeral and wiped on container recreation. The `install()` hook only runs on first plugin installation, not on restart.
+  - **Fix**: on startup, scan `/a0/usr/plugins/` for `requirements.txt` files and reinstall dependencies. `PIP_CACHE_DIR` is set to persistent storage (`/a0/usr/.pip-cache`) so subsequent installs use local cache and complete in seconds.
+
+---
+
 ## [1.4.11] - 2026-03-23
 
 ### Fixed
